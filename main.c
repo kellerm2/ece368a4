@@ -99,10 +99,10 @@ while (open_windows > 0) {// always take commands if window is open
     }
     
     // print current open window
-    for (int j=0;j<open_windows;j++) {
-        printf("[%d ", windows[j]);
-    }
-    printf("] OW: %d\n", open_windows);
+    // for (int j=0;j<open_windows;j++) {
+    //     printf("[%d ", windows[j]);
+    // }
+    // printf("] OW: %d\n", open_windows);
     if (open_windows > 0) printf("%d\n", current_window);
 }
     return 0;
