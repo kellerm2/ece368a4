@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -g
 RM = rm -f
+VAL = valgrind --tool=memcheck --log-file=memcheck.txt --leak-check=full --verbose
 
 SRCS = main.c
 OBJS = $(SRCS:.c=.o)
@@ -8,6 +9,8 @@ OBJS = $(SRCS:.c=.o)
 TARGET = a4
 
 # default: all
+testmemory: $(TARGET)
+	$(VAL) ./$(TARGET)
 
 all: a4
 
