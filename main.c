@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 
 
@@ -25,23 +24,29 @@ int open_windows = 1; // Number of windows opened in total
 int * windows = NULL; // Ordered list of all windows
 int * add_windows = NULL; // Reallocated windows
 
-scanf("%s %d", &command, &id);
+scanf("%s %d", command, &id);
 
 // allocate first open window assuming valid inputs
 current_window = id; // we are looking at the window we just opened
 add_windows = realloc(windows, sizeof(int)); // realloc for first window
-assert(add_windows != NULL);
+if( add_windows == NULL) { // will assert if 1 item left so above takes care of this
+    free(windows);
+    return 1;
+}
 windows = add_windows;
 windows[0] = id; // add to total windows
 printf("%d\n", id); // print first window
 
 while (open_windows > 0) {// always take commands if window is open
-    scanf("%s %d", &command, &id); // get new command
+    scanf("%s %d", command, &id); // get new command
 
     if (strcmp(command, "open") == 0) {
         // create new window with window id
         add_windows = (int*)realloc(windows, (open_windows + 1) * sizeof(int));
-        assert (add_windows != NULL);
+        if( add_windows == NULL) { // will assert if 1 item left so above takes care of this
+                free(windows);
+                return 1;
+        }
 
         // currently looking at newly created window
         windows = add_windows;
@@ -63,7 +68,7 @@ while (open_windows > 0) {// always take commands if window is open
         }
         current_window = id;
     }
-    else { // command is close
+    else if (strcmp(command, "close") == 0) { // command is close
         // if close is different id from current looking, stay on current
         // and delete closed id... current stays same
         if (current_window != id) {
@@ -74,10 +79,13 @@ while (open_windows > 0) {// always take commands if window is open
                 windows[i] = windows[i + 1]; // move all indexes to the left after found ID
             }
 
-            windows[open_windows - 1] = to_close; // tack switched ID onto end
+            windows[open_windows - 1] = to_close; // tack closed ID onto end
 
             add_windows = (int *)realloc(windows, (open_windows - 1) * sizeof(int));
-            assert (add_windows != NULL);
+            if( add_windows == NULL) { // will assert if 1 item left so above takes care of this
+                free(windows);
+                return 1;
+            }
             windows = add_windows;
             open_windows -= 1;
         }
@@ -86,12 +94,16 @@ while (open_windows > 0) {// always take commands if window is open
         else { // window to be closed should be last in array then
             if (open_windows == 1) { // only one item left
                 windows = NULL;
+                free(add_windows); // in case it holds previous memory alloc
                 free(windows);
                 return 0;
             }
             
             add_windows = (int *)realloc(windows, (open_windows - 1) * sizeof(int));
-            assert (add_windows != NULL); // will assert if 1 item left
+            if(add_windows == NULL) { // will assert if 1 item left so above takes care of this
+                free(windows);
+                return 1;
+            } 
             windows = add_windows;
             current_window = windows[open_windows - 2];
             open_windows -= 1;
@@ -105,5 +117,7 @@ while (open_windows > 0) {// always take commands if window is open
     // printf("] OW: %d\n", open_windows);
     if (open_windows > 0) printf("%d\n", current_window);
 }
+    free(windows); // free in case
+    free(add_windows);
     return 0;
 }

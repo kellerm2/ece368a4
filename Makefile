@@ -18,4 +18,4 @@ a4: $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
 clean:
-	$(RM) $(TARGET) $(OBJS)
+	$(RM) $(TARGET) $(OBJS) memcheck.txt
