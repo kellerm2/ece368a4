@@ -11,7 +11,6 @@ for (int i = 0; i < len; i++) {
     if (windows[i] == id) return i; // returns index of ID to be switched to
 }
 return -1;
-
 }
 
 
@@ -40,7 +39,8 @@ printf("%d\n", id); // print first window
 while (open_windows > 0) {// always take commands if window is open
     scanf("%s %d", command, &id); // get new command
 
-    if (strcmp(command, "open") == 0) {
+    if (strcmp(command, "open") == 0) { // add new window to end of windows order and make that
+        // window the current window
         // create new window with window id
         add_windows = (int*)realloc(windows, (open_windows + 1) * sizeof(int));
         if( add_windows == NULL) { // will assert if 1 item left so above takes care of this
@@ -54,9 +54,10 @@ while (open_windows > 0) {// always take commands if window is open
         current_window = id;
         open_windows += 1; // we added a window
     } 
-    else if (strcmp(command, "switch") == 0) {
+    else if (strcmp(command, "switch") == 0) { // current window is changed to a input id window
+        // and that input id window is moved to the end of window order
         // no new windows are added to the ordered list
-        // currently looking at different window in the ordered list
+        // if currently looking at different window in the ordered list than the input id
         if (id != windows[open_windows - 1]) {
         
         int stop = search_windows(windows, open_windows, id); // where id is found
@@ -68,10 +69,10 @@ while (open_windows > 0) {// always take commands if window is open
         }
         current_window = id;
     }
-    else if (strcmp(command, "close") == 0) { // command is close
-        // if close is different id from current looking, stay on current
-        // and delete closed id... current stays same
-        if (current_window != id) {
+    else if (strcmp(command, "close") == 0) { // delete input id window from the order list
+        // if close input id is not current window, current window does not change
+        // but close window must move to end of order, all windows to the right of it must move to left
+        if (current_window != id) { // if current window is not to be closed
             int stop = search_windows(windows, open_windows, id);
 
             int to_close = windows[stop];
@@ -89,13 +90,13 @@ while (open_windows > 0) {// always take commands if window is open
             windows = add_windows;
             open_windows -= 1;
         }
-        // if close is same id as current looking, delete id, current is
-        // is now most previous opened or switched to in list
-        else { // window to be closed should be last in array then
-            if (open_windows == 1) { // only one item left
+        // if close is same id as current window, delete window at end (far right) of order
+        // current is now most previous opened or switched to in list (second to end)
+        else { // if window to be closed is current window
+            if (open_windows == 1) { // if only one item left is closed, must terminate program
                 windows = NULL;
                 free(add_windows); // in case it holds previous memory alloc
-                free(windows);
+                free(windows); // extra measure
                 return 0;
             }
             
@@ -104,8 +105,8 @@ while (open_windows > 0) {// always take commands if window is open
                 free(windows);
                 return 1;
             } 
-            windows = add_windows;
-            current_window = windows[open_windows - 2];
+            windows = add_windows; // cuts off current window to be closed
+            current_window = windows[open_windows - 2]; // current window is second to last
             open_windows -= 1;
         }
     }
